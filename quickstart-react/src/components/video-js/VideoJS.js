@@ -3,20 +3,16 @@ import VideoPlayer from "react-video-js-player";
 import MOVIE2 from "../../Assets/PetishiOSrec.mov";
 import MOVIE1 from "../../Assets/League-app screen.mov";
 import "./Video.css";
-//75b9b24ff9645307419f67d700113fdf
-//`query ($boardIds: [Int]) { boards (ids:$boardIds) { name items(limit:1) { name id } } }`,
 
 const VideoJS = (itemId) => {
+  const itemid = parseInt(itemId.itemId);
+  const [videoUrl, setVideoUrl] = React.useState("");
+  let query =
+    "query { items (ids: [" + itemid + "]) { name, updates{assets{url}} }}";
 
-  const itemid = parseInt(itemId.itemId.itemId);
-  const [videoUrl, setVideoUrl] = React.useState();
-  console.log(itemid);
-  let query = `query  ($itemid: Int) { items (ids: [$itemid]) { name, updates{assets{url}} }}`;
   React.useEffect(() => {
-    console.log(itemid);
-    if (itemid != 0) {
-    signUpSecond()}
-  }, [itemid]);
+    signUpSecond();
+  }, []);
 
   const signUpSecond = async () => {
     try {
@@ -30,19 +26,22 @@ const VideoJS = (itemId) => {
         body: JSON.stringify({ query: query }),
       });
       const data = await res.json();
-      console.log(data);
-      // setVideoUrl(data.data.items[0].updates[0].assets[0].url)
+      // console.log(data);
+      setVideoUrl(data.data.items[0].updates[0].assets[0].url);
     } catch (err) {
       console.log(err);
     }
   };
-  // console.log(videoUrl);
-
-  return (
-    <div>
-      <VideoPlayer src={MOVIE2} playbackRates={[0.5, 2, 3, 4]} />
-    </div>
-  );
+  console.log(typeof videoUrl);
+  if (videoUrl != "") {
+    return (
+      <div>
+        <VideoPlayer src={videoUrl} playbackRates={[0.5, 2, 3, 4]} />
+      </div>
+    );
+  } else {
+    return <div></div>;
+  }
 };
 
 export default VideoJS;

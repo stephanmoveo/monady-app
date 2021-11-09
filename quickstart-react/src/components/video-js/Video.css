@@ -2,10 +2,13 @@
   display: block;
   margin: 20px auto;
   border-radius: 10px;
-  width: 400px;
+  width: 80%;
   height: 400px;
 }
 .movie-text {
   color: white;
   text-align: center;
+}
+.video-container {
+  padding: 20px 0 100px 0;
 }

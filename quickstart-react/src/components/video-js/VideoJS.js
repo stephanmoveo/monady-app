@@ -1,42 +1,49 @@
 import React from "react";
 import VideoPlayer from "react-video-js-player";
-import MOVIE2 from "../../Assets/PetishiOSrec.mov";
-import MOVIE1 from "../../Assets/League-app screen.mov";
 import "./Video.css";
+import mondaySdk from "monday-sdk-js";
+const monday = mondaySdk();
 
 const VideoJS = (itemId) => {
   const itemid = parseInt(itemId.itemId);
   const [videoUrl, setVideoUrl] = React.useState("");
+  const [updatesNewArr, setupdatesNewArr] = React.useState([]);
+  let updatesArr = [];
   let query =
     "query { items (ids: [" + itemid + "]) { name, updates{assets{url}} }}";
 
   React.useEffect(() => {
-    signUpSecond();
+    monday
+      .api(query)
+      .then((res) => {
+        console.log(res.data);
+        res.data.items[0].updates.forEach((update) => {
+          if (update.assets.length > 0) {
+            update.assets.forEach((item) => {
+              updatesArr.push(item.url);
+              console.log(updatesArr);
+            });
+          }
+        });
+        setupdatesNewArr(updatesArr);
+      })
+      .then((res) => console.log(res));
   }, []);
 
-  const signUpSecond = async () => {
-    try {
-      const res = await fetch("https://api.monday.com/v2", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization:
-            "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjEzMjA0MDgyMCwidWlkIjoyNDUzMjYzNywiaWFkIjoiMjAyMS0xMS0wOFQxMDozNTozOC44NjhaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTEwMjMyOCwicmduIjoidXNlMSJ9.f8Vjl4gHGNrCM1XHZV737XuzmDzLEsPCN_svrRHx1Zk",
-        },
-        body: JSON.stringify({ query: query }),
-      });
-      const data = await res.json();
-      // console.log(data);
-      setVideoUrl(data.data.items[0].updates[0].assets[0].url);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  console.log(typeof videoUrl);
-  if (videoUrl != "") {
+  if (updatesNewArr.length > 0) {
     return (
       <div>
-        <VideoPlayer src={videoUrl} playbackRates={[0.5, 2, 3, 4]} />
+        {updatesNewArr.map((item, index) => {
+          console.log(item);
+          let tempss = item.split("/").pop().replace("%20", " ");
+
+          return (
+            <div key={index}>
+              <div className="movie-text"> {tempss}</div>
+              <VideoPlayer src={item} playbackRates={[0.5, 1, 2, 3, 4]} />
+            </div>
+          );
+        })}
       </div>
     );
   } else {

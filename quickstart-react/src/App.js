@@ -10,7 +10,7 @@ export default function App() {
   React.useEffect(() => {
     monday.get("context").then((res) => setitemId(res.data.itemIds[0]));
   }, []);
-  if (itemId != 0) {
+  if (itemId !== 0) {
     return (
       <div>
         <VideoJS itemId={itemId} />

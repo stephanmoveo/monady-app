@@ -1,7 +1,11 @@
-.video-js{
+.video-js {
   display: block;
-  margin: auto;
+  margin: 20px auto;
   border-radius: 10px;
   width: 400px;
-height: 400px;
+  height: 400px;
+}
+.movie-text {
+  color: white;
+  text-align: center;
 }

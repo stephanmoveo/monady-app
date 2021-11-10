@@ -47,7 +47,9 @@ const VideoJS = (itemId) => {
             {/* <VideoPlayer src={item} playbackRates={[0.5, 1, 2, 3, 4]} /> */}
             <VideoJS2
               src={item}
+              index={index}
               onReady={handlePlayerReady}
+              itemid={itemid}
             />
           </div>
         );

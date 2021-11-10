@@ -7,21 +7,19 @@ import AnnotationComments from "@contently/videojs-annotation-comments";
 import "@contently/videojs-annotation-comments/build/css/annotations.css";
 videojs.registerPlugin("annotationComments", AnnotationComments(videojs));
 const monday = mondaySdk();
-let pluginOptions = {
-  annotationsObjects: [],
-  meta: { user_id: null, user_name: null },
-  bindArrowKeys: true,
-  showControls: true,
-  showCommentList: true,
-  showFullScreen: true,
-  showMarkerShapeAndTooltips: true,
-  internalCommenting: true,
-  startInAnnotationMode: true,
-};
-const VideoJS2 = ({ src, onReady, index, itemid }) => {
-  const [getComments, setGetComments] = React.useState([]);
-  const [isUpdate, setisUpdate] = React.useState(false);
 
+const VideoJS2 = ({ src, onReady, index, itemid }) => {
+  let pluginOptions = {
+    annotationsObjects: [],
+    meta: { user_id: null, user_name: "stephan" },
+    bindArrowKeys: true,
+    showControls: true,
+    showCommentList: true,
+    showFullScreen: true,
+    showMarkerShapeAndTooltips: true,
+    internalCommenting: true,
+    startInAnnotationMode: true,
+  };
   const videoJsOptions = {
     autoplay: false,
     controls: true,
@@ -37,63 +35,38 @@ const VideoJS2 = ({ src, onReady, index, itemid }) => {
   };
   const videoRef = React.useRef(null);
   const playerRef = React.useRef(null);
-  //   const [plugin, setplugin] = React.useState()
   React.useEffect(() => {
     monday.storage.instance
       .getItem(itemid.toString() + "k" + index.toString())
       .then((res) => {
         let pluginOptions2 = {
           ...pluginOptions,
-          annotationsObjects: res.data.value === null ? [] :JSON.parse(res.data.value),
+          annotationsObjects:
+            res.data.value === null ? [] : JSON.parse(res.data.value),
         };
-        console.log(pluginOptions2.annotationsObjects);
+        // console.log(pluginOptions2);
+        const videoElement = videoRef.current;
+        if (!videoElement) return;
+        const player = (playerRef.current = videojs(
+          videoElement,
+          videoJsOptions,
+          () => {
+            onReady && onReady(player);
 
-        let plugin;
-        // make sure Video.js player is only initialized once
-        if (!playerRef.current) {
-          const videoElement = videoRef.current;
-          if (!videoElement) return;
-          const player = (playerRef.current = videojs(
-            videoElement,
-            videoJsOptions,
-            () => {
-              console.log("plugin running");
-              onReady && onReady(player);
-
-              console.log("in player rerender");
-              console.log(pluginOptions);
-              plugin = player.annotationComments(pluginOptions2);
-              plugin.onReady(() => {});
-              plugin.registerListener("onStateChanged", (event) => {
-                // event.detail = annotation state data
-                monday.storage.instance
-                  .setItem(
-                    itemid.toString() + "k" + index.toString(),
-                    JSON.stringify(event.detail)
-                  )
-                  .then((res) => {
-                    console.log(res);
-                  });
-              });
-            }
-          ));
-        } else {
-          console.log("elseeee");
-          console.log(pluginOptions);
-          const player = playerRef.current;
-          plugin = player.annotationComments(pluginOptions2);
-          plugin.onReady(() => {});
-          plugin.registerListener("onStateChanged", (event) => {
-            monday.storage.instance
-              .setItem(
-                itemid.toString() + "k" + index.toString(),
-                JSON.stringify(event.detail)
-              )
-              .then((res) => {
-                console.log(res);
-              });
-          });
-        }
+            let plugin = player.annotationComments(pluginOptions2);
+            plugin.onReady(() => {});
+            plugin.registerListener("onStateChanged", (event) => {
+              monday.storage.instance
+                .setItem(
+                  itemid.toString() + "k" + index.toString(),
+                  JSON.stringify(event.detail)
+                )
+                .then((res) => {
+                  console.log(res);
+                });
+            });
+          }
+        ));
       });
   }, [videoJsOptions]);
   React.useEffect(() => {

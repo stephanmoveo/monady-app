@@ -8,8 +8,9 @@ String.prototype.replaceAll = function (search, replacement) {
   var target = this;
   return target.replace(new RegExp(search, "g"), replacement);
 };
-const VideoJS = (itemId) => {
-  const itemid = parseInt(itemId.itemId);
+const VideoJS = ({contextData}) => {
+  console.log(contextData);
+  const itemid = contextData.data.itemId
   const [updatesNewArr, setupdatesNewArr] = React.useState([]);
   let updatesArr = [];
   let query =

@@ -3,6 +3,7 @@ import "./App.css";
 import mondaySdk from "monday-sdk-js";
 import "monday-ui-react-core/dist/main.css";
 import VideoJS from "./components/video-js/VideoJS";
+import VideoJS2 from  "./components/video-js/VideoJS2"
 const monday = mondaySdk();
 monday.setToken(
   "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjEzMjA0MDgyMCwidWlkIjoyNDUzMjYzNywiaWFkIjoiMjAyMS0xMS0wOFQxMDozNTozOC44NjhaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTEwMjMyOCwicmduIjoidXNlMSJ9.f8Vjl4gHGNrCM1XHZV737XuzmDzLEsPCN_svrRHx1Zk"
@@ -16,9 +17,11 @@ export default function App() {
       .get("context")
       .then((res) => {
         setitemId(res);
+        console.log(itemId);
       })
       .catch((res) => console.log(res));
   }, []);
+
   if (itemId !== 0) {
     return (
       <div>
@@ -26,6 +29,6 @@ export default function App() {
       </div>
     );
   } else {
-    return <div></div>;
+    return <div>heloooo</div>;
   }
 }

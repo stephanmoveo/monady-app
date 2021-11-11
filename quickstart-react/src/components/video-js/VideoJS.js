@@ -12,10 +12,10 @@ String.prototype.replaceAll = function (search, replacement) {
 };
 const VideoJS = ({ contextData }) => {
   const [userName, setUserName] = React.useState("");
-  let temp = contextData.data.user.id
+  let temp = contextData.data.user.id;
   React.useEffect(() => {
     monday
-      .api("query { users(ids: ["+temp+"]) { name }}")
+      .api("query { users(ids: [" + temp + "]) { name }}")
       .then((res) => {
         setUserName(res.data.users[0].name);
         console.log(res);
@@ -25,6 +25,13 @@ const VideoJS = ({ contextData }) => {
 
   const itemid = contextData.data.itemId;
   const [updatesNewArr, setupdatesNewArr] = React.useState([]);
+  const extensionsArr = ["mp4", "mov", "webm", "ogv", "avi", "wmv", "mkv"];
+  const isCompatibale = (fileType) => {
+    for (const element of extensionsArr) {
+      if (element === fileType) return true;
+    }
+    return false;
+  };
   let updatesArr = [];
   let query =
     "query { items (ids: [" + itemid + "]) { name, updates{assets{url}} }}";
@@ -36,7 +43,10 @@ const VideoJS = ({ contextData }) => {
         res.data.items[0].updates.forEach((update) => {
           if (update.assets.length > 0) {
             update.assets.forEach((item) => {
-              updatesArr.push(item.url);
+              if (isCompatibale(item.url.split(".").pop())) {
+                updatesArr.push(item.url);
+              }
+              // updatesArr.push(item.url);
             });
           }
         });

@@ -28,6 +28,6 @@ export default function App() {
       </div>
     );
   } else {
-    return <div>heloooo</div>;
+    return <div></div>;
   }
 }

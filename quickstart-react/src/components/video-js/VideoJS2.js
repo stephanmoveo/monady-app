@@ -8,10 +8,31 @@ import "@contently/videojs-annotation-comments/build/css/annotations.css";
 videojs.registerPlugin("annotationComments", AnnotationComments(videojs));
 const monday = mondaySdk();
 
-const VideoJS2 = ({ src, onReady, index, itemid }) => {
+const VideoJS2 = ({ src, onReady, index, itemid, userName }) => {
+
+
+  const configurePlugin = (player, pluginOptions2, itemid, index) => {
+    let plugin = player.annotationComments(pluginOptions2);
+    plugin.onReady(() => {});
+    plugin.registerListener("annotationDeleted", (event) => {
+      plugin.fire("toggleAnnotationMode"); // toggle off
+      plugin.fire("toggleAnnotationMode"); // toggle on
+    });
+    plugin.registerListener("onStateChanged", (event) => {
+      monday.storage.instance
+        .setItem(
+          itemid.toString() + "k" + index.toString(),
+          JSON.stringify(event.detail)
+        )
+        .then((res) => {
+          console.log(res);
+        });
+    });
+  };
+
   let pluginOptions = {
     annotationsObjects: [],
-    meta: { user_id: null, user_name: "stephan" },
+    meta: { user_id: null, user_name: userName },
     bindArrowKeys: true,
     showControls: true,
     showCommentList: true,
@@ -20,6 +41,7 @@ const VideoJS2 = ({ src, onReady, index, itemid }) => {
     internalCommenting: true,
     startInAnnotationMode: true,
   };
+
   const videoJsOptions = {
     autoplay: false,
     controls: true,
@@ -33,18 +55,19 @@ const VideoJS2 = ({ src, onReady, index, itemid }) => {
       },
     ],
   };
+
   const videoRef = React.useRef(null);
   const playerRef = React.useRef(null);
+
   React.useEffect(() => {
     monday.storage.instance
       .getItem(itemid.toString() + "k" + index.toString())
       .then((res) => {
-        let pluginOptions2 = {
+        let newPluginOptions = {
           ...pluginOptions,
           annotationsObjects:
             res.data.value === null ? [] : JSON.parse(res.data.value),
         };
-        // console.log(pluginOptions2);
         const videoElement = videoRef.current;
         if (!videoElement) return;
         const player = (playerRef.current = videojs(
@@ -52,23 +75,12 @@ const VideoJS2 = ({ src, onReady, index, itemid }) => {
           videoJsOptions,
           () => {
             onReady && onReady(player);
-
-            let plugin = player.annotationComments(pluginOptions2);
-            plugin.onReady(() => {});
-            plugin.registerListener("onStateChanged", (event) => {
-              monday.storage.instance
-                .setItem(
-                  itemid.toString() + "k" + index.toString(),
-                  JSON.stringify(event.detail)
-                )
-                .then((res) => {
-                  console.log(res);
-                });
-            });
+            configurePlugin(player, newPluginOptions, itemid, index);
           }
         ));
       });
   }, [videoJsOptions]);
+
   React.useEffect(() => {
     return () => {
       if (playerRef.current) {
@@ -77,6 +89,7 @@ const VideoJS2 = ({ src, onReady, index, itemid }) => {
       }
     };
   }, []);
+
   return (
     <div data-vjs-player>
       <video

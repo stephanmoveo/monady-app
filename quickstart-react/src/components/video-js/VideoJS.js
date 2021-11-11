@@ -1,16 +1,29 @@
 import React from "react";
-import VideoPlayer from "react-video-js-player";
 import "./Video.css";
 import VideoJS2 from "./VideoJS2";
 import mondaySdk from "monday-sdk-js";
 const monday = mondaySdk();
+monday.setToken(
+  "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjEzMjA0MDgyMCwidWlkIjoyNDUzMjYzNywiaWFkIjoiMjAyMS0xMS0wOFQxMDozNTozOC44NjhaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTEwMjMyOCwicmduIjoidXNlMSJ9.f8Vjl4gHGNrCM1XHZV737XuzmDzLEsPCN_svrRHx1Zk"
+);
 String.prototype.replaceAll = function (search, replacement) {
   var target = this;
   return target.replace(new RegExp(search, "g"), replacement);
 };
-const VideoJS = ({contextData}) => {
-  console.log(contextData);
-  const itemid = contextData.data.itemId
+const VideoJS = ({ contextData }) => {
+  const [userName, setUserName] = React.useState("");
+  let temp = contextData.data.user.id
+  React.useEffect(() => {
+    monday
+      .api("query { users(ids: ["+temp+"]) { name }}")
+      .then((res) => {
+        setUserName(res.data.users[0].name);
+        console.log(res);
+      })
+      .catch((res) => console.log(res));
+  }, []);
+
+  const itemid = contextData.data.itemId;
   const [updatesNewArr, setupdatesNewArr] = React.useState([]);
   let updatesArr = [];
   let query =
@@ -37,7 +50,7 @@ const VideoJS = ({contextData}) => {
     playerRef.current = player;
   };
 
-  return updatesNewArr.length > 0 ? (
+  return updatesNewArr.length > 0 && userName !== "" ? (
     <div className="video-container">
       {updatesNewArr.map((item, index) => {
         return (
@@ -45,8 +58,8 @@ const VideoJS = ({contextData}) => {
             <div className="movie-text">
               {item.split("/").pop().replaceAll("%20", " ")}
             </div>
-            {/* <VideoPlayer src={item} playbackRates={[0.5, 1, 2, 3, 4]} /> */}
             <VideoJS2
+              userName={userName}
               src={item}
               index={index}
               onReady={handlePlayerReady}

@@ -3,7 +3,7 @@
   margin: 20px auto;
   border-radius: 10px;
   width: 80% ;
-  /* height: 400px !important; */
+  height: 400px !important;
 }
 .movie-text {
   color: white;
@@ -12,4 +12,16 @@
 
 .video-container {
   padding: 20px 0 100px 0;   
+}
+.vac-delete-comment{
+  display: none !important;
+}
+.video-js .vac-controls button , .vac-button, .vac-marker {
+background: #0085ff !important;
+}
+ .vac-marker:hover {
+  background: #794FCF !important;
+  }
+ .video-js.vac-active .vac-player-btn .vjs-icon-placeholder .vac-player-icon svg {
+  fill: #0085ff !important;
 }
